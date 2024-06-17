@@ -11,3 +11,4 @@ Requires-Dist: pandas
 Requires-Dist: matplotlib
 Requires-Dist: seaborn
 Requires-Dist: scikit-learn
+Requires-Dist: fastapi
