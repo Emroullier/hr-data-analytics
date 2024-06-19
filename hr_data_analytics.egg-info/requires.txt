@@ -8,3 +8,5 @@ matplotlib
 seaborn
 scikit-learn
 fastapi
+uvicorn
+notebook
