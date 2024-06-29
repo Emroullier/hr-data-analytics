@@ -9,3 +9,5 @@ seaborn
 scikit-learn
 fastapi
 uvicorn
+colorama
+xgboost
