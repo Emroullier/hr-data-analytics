@@ -1,5 +1,6 @@
 # Basic libraries
 import pandas as pd
+import numpy as np
 from colorama import Fore, Style
 
 #Pipelines and transformers
@@ -23,20 +24,21 @@ def predict_leaving(X_pred, model):
     - Return a ranking based on the probability
       of a employee leaving company
     """
-    print(Fore.MAGENTA + "\n ⭐️ Use case: prediction of employee leaving" + Style.RESET_ALL)
+    print(Fore.MAGENTA + "\n ⭐️ Use case: prediction of employee leaving (output)" + Style.RESET_ALL)
     #Retrieve dataset from local directory
     data = pd.read_csv(DATA_HR)
 
     # Clean data using data.py
-    # Clean database
     data = clean_data_leaving(data)
-    # Clean data used for prediction
     X_pred = clean_data_leaving(X_pred)
+    print("✅ data cleaned")
 
     # Create X and y
     X = data.drop(columns=['left_company'])
     y = data['left_company']
 
+    # Drop target from X_pred
+    X_pred.drop(columns=['left_company'], inplace=True)
     X_pred_index = X_pred.index
 
     # Create (X_train_encoded, X_test_encoded) using `preprocessor.py`
@@ -76,11 +78,15 @@ def predict_hiring(X_pred, model):
 
     # Clean data using data.py
     data = clean_data_hiring(data)
+    X_pred = clean_data_hiring(X_pred)
+    print("✅ data cleaned")
 
     # Create X and y
     X = data.drop(columns=['left_company'])
     y = data['left_company']
 
+    # Drop target from X_pred
+    X_pred.drop(columns=['left_company'], inplace=True)
     X_pred_index = X_pred.index
 
     # Create (X_train_encoded, X_test_encoded) using `preprocessor.py`
@@ -104,34 +110,37 @@ def predict_hiring(X_pred, model):
     print(f"Ranking  : \n {X_test_final}")
     print(f"✅ predict_hiring() done")
 
-def generate_input_leaving():
+
+def generate_input_leaving(num):
     """
     - Generate dummy input features ONLY for testing application
     - Beware : Obvious data leakage.
     - This will replaced by user input. Pandas Dataframe expected.
     """
+    print(Fore.MAGENTA + f"\n ⭐️ Input data : {num} random employees considered here" + Style.RESET_ALL)
     data = pd.read_csv(DATA_HR)
-    input_features = data.iloc[470:485]
-    print(type(input_features))
+    input_features = data.sample(num)
+    print(input_features)
     return input_features
 
-def generate_input_hiring():
+def generate_input_hiring(num):
     """
     - Generate dummy input features ONLY for testing application
     - Beware : Obvious data leakage.
     - This will replaced by user input. Pandas Dataframe expected.
     """
+    print(Fore.MAGENTA + f"\n ⭐️ Input data : {num} applicants considered here" + Style.RESET_ALL)
     data = pd.read_csv(DATA_HR)
-    data = clean_data_hiring(data)
-    data.drop(columns=['left_company'], inplace = True)
-
     # Check the applicants for a specific job
-    query = "@data['department'] == 'Operations'      and\
-            @data['geo']=='UK'                    and\
-            @data['role']== 'Level 2-4'           and\
+    query = f"@data['Department'] == 'Sales'      and\
+            @data['GEO']=='UK'                    and\
             @data['average_montly_hours'] > 200   and\
-            @data['salary']=='low'"
+            @data['salary']=='low'                 and\
+            @data['Role']=='Level 2-4'"
+
     input_features = data.query(query)
+    input_features = input_features.sample(num)
+    print(input_features)
     return input_features
 
 def say_hello():
@@ -140,12 +149,13 @@ def say_hello():
 if __name__ == '__main__':
     try:
         # *** predict_leaving : Lists employees likely to quit the company ***
-        predict_leaving(generate_input_leaving(),XGBClassifier())
+        predict_leaving(generate_input_leaving(10),XGBClassifier())
 
         # *** predict_hiring : Ranks a set of applicants applying for the same job.***
-        # predict_hiring(generate_input_hiring(),GradientBoostingClassifier())
+        # predict_hiring(generate_input_hiring(10),GradientBoostingClassifier())
 
         # say_hello()
+
     except:
         import sys
         import traceback

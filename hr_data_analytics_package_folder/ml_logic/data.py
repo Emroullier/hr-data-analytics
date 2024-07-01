@@ -44,7 +44,10 @@ def clean_data_leaving(df: pd.DataFrame) -> pd.DataFrame:
                     'emp_sat_remote_2','emp_sat_remote_1',
                     'emp_engagement_1'], inplace = True)
 
-    print("✅ data cleaned")
+    #Dev purpose
+    df.drop(columns=['critical'])
+
+    # print("✅ data cleaned")
     return df
 
 
@@ -93,9 +96,15 @@ def clean_data_hiring(df: pd.DataFrame) -> pd.DataFrame:
                     'emp_engagement_1'], inplace = True)
 
     # Specific preparation for applicants
-    job_posting = ['department','geo','role', 'critical','average_montly_hours','salary']
+    # job_posting = ['department','geo','role',
+    #                'average_montly_hours',
+    #                'salary','critical']
+
+    job_posting = ['department','geo','role',
+                'average_montly_hours',
+                'salary']
+
     applicant = ['will_relocate', 'gender']
     df = df[job_posting + applicant + ['left_company']]
-    print("✅ data cleaned")
 
     return df

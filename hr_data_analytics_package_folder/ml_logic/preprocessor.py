@@ -39,7 +39,7 @@ def preprocess_features_leaving():
     preproc_leaving = make_column_transformer(
         # Basic imputations
         (FunctionTransformer(imputer_gender,feature_names_out ='one-to-one'), ['gender']),
-        (FunctionTransformer(imputer_critical,feature_names_out ='one-to-one'), ['critical']),
+        # (FunctionTransformer(imputer_critical,feature_names_out ='one-to-one'), ['critical']),
         (SimpleImputer(strategy='most_frequent'), simp_impute_scale_cols),
 
         #Numerical preproc
@@ -52,7 +52,7 @@ def preprocess_features_leaving():
 
         #Remaining columns pass
         remainder='passthrough',
-        force_int_remainder_cols=False
+        # force_int_remainder_cols=False
     )
     return preproc_leaving
 
@@ -81,7 +81,7 @@ def preprocess_features_hiring():
     preproc_hiring = make_column_transformer(
         # Basic imputations
         (FunctionTransformer(imputer_gender,feature_names_out ='one-to-one'), ['gender']),
-        (FunctionTransformer(imputer_critical,feature_names_out ='one-to-one'), ['critical']),
+        # (FunctionTransformer(imputer_critical,feature_names_out ='one-to-one'), ['critical']),
 
         #Numerical preproc
         (MinMaxScaler(), minmax_scale_cols),
@@ -92,6 +92,6 @@ def preprocess_features_hiring():
 
         #Remaining columns pass
         remainder='passthrough',
-        force_int_remainder_cols=False
+        # force_int_remainder_cols=False
     )
     return preproc_hiring
