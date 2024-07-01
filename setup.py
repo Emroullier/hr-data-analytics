@@ -9,4 +9,4 @@ requirements = [x.strip() for x in content]
 setup(name='hr-data-analytics',
       description="hr-data-analytics project ",
       packages=find_packages(), # NEW: find packages automatically
-     install_requires=requirements) # NEW
+      install_requires=requirements) # NEW

@@ -14,7 +14,7 @@ from hr_data_analytics_package_folder.ml_logic.data import clean_data_hiring, cl
 from hr_data_analytics_package_folder.ml_logic.preprocessor import preprocess_features_hiring, preprocess_features_leaving
 from hr_data_analytics_package_folder.params import *
 
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI,UploadFile, File
 
 app = FastAPI()
 
@@ -22,41 +22,18 @@ app = FastAPI()
 def index():
     return {'HR data analytics project': 'This is the first app of our project !!!'}
 
+
 @app.post("/upload_predict_hiring")
-async def create_upload_file(file: UploadFile):
-    X_pred = await file.read(size=-1)
-    X_pred = X_pred.decode().replace("'", '"')
-    X_pred = json.loads(X_pred)
-    # X_pred = pd.DataFrame(X_pred, index =[0])
-# ************************************
-    # At least 2 applicants !!!
-    new_dict = {}
-    ind = []
-    for k in X_pred.keys():
-        new_dict[k] = X_pred[k].values()
-        ind.append(X_pred[k].keys())
-    ind = ind[0]
-# ************************************
-    X_pred = pd.DataFrame(new_dict, index=ind)
+def create_upload_files(upload_file: UploadFile = File(...)):
+    json_data = json.load(upload_file.file)
+    X_pred = pd.DataFrame(json_data)
     response = predict_hiring(X_pred)
     return {'Content' : response}
 
-
 @app.post("/upload_predict_leaving")
-async def create_upload_file(file: UploadFile):
-    X_pred = await file.read(size=-1)
-    X_pred = X_pred.decode().replace("'", '"')
-    X_pred = json.loads(X_pred)
-    # *********************************
-    # At least 2 employees !!!
-    new_dict = {}
-    ind = []
-    for k in X_pred.keys():
-        new_dict[k] = X_pred[k].values()
-        ind.append(X_pred[k].keys())
-    ind = ind[0]
-# ************************************
-    X_pred = pd.DataFrame(new_dict, index=ind)
+def create_upload_files(upload_file: UploadFile = File(...)):
+    json_data = json.load(upload_file.file)
+    X_pred = pd.DataFrame(json_data)
     response = predict_leaving(X_pred)
     return {'Content' : response}
 
@@ -107,7 +84,6 @@ def predict_hiring(X_pred):
     X_test_final.sort_values('prob_stay', ascending=False, inplace=True)
 
     print(f"Ranking  : \n {X_test_final}")
-
     return {'Probability to stay' : f"{round(X_test_final['prob_stay'],3)}",
         "Global picture" : f"{X_test_final}" }
 
@@ -160,6 +136,5 @@ def predict_leaving(X_pred):
     X_test_final.sort_values('prob_leave', ascending=False, inplace=True)
 
     print(f"Ranking  : \n {X_test_final}")
-
     return {'Probability to leave' : f"{round(X_test_final['prob_leave'],3)}",
-        "Global picture" : f"{X_test_final}" }
+    "Global picture" : f"{X_test_final}" }

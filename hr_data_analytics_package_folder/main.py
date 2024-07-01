@@ -149,10 +149,10 @@ def say_hello():
 if __name__ == '__main__':
     try:
         # *** predict_leaving : Lists employees likely to quit the company ***
-        # predict_leaving(generate_input_leaving(10),XGBClassifier())
+        predict_leaving(generate_input_leaving(10),XGBClassifier())
 
         # *** predict_hiring : Ranks a set of applicants applying for the same job.***
-        predict_hiring(generate_input_hiring(10),GradientBoostingClassifier())
+        # predict_hiring(generate_input_hiring(10),GradientBoostingClassifier())
 
         # say_hello()
 
