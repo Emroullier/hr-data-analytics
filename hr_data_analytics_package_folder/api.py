@@ -22,20 +22,19 @@ app = FastAPI()
 def index():
     return {'HR data analytics project': 'This is the first app of our project !!!'}
 
-
 @app.post("/upload_predict_hiring")
 def create_upload_files(upload_file: UploadFile = File(...)):
     json_data = json.load(upload_file.file)
     X_pred = pd.DataFrame(json_data)
     response = predict_hiring(X_pred)
-    return {'Content' : response}
+    return {'Ranking' : response}
 
 @app.post("/upload_predict_leaving")
 def create_upload_files(upload_file: UploadFile = File(...)):
     json_data = json.load(upload_file.file)
     X_pred = pd.DataFrame(json_data)
     response = predict_leaving(X_pred)
-    return {'Content' : response}
+    return {'Ranking' : response}
 
 
 def predict_hiring(X_pred):
@@ -82,10 +81,10 @@ def predict_hiring(X_pred):
     X_test_final = pd.merge(X_pred, prediction, left_index=True, right_index=True)
     X_test_final.drop(columns=['prob_leave'], inplace=True)
     X_test_final.sort_values('prob_stay', ascending=False, inplace=True)
+    X_test_final['prob_stay'] = round(X_test_final['prob_stay'],3)
 
     print(f"Ranking  : \n {X_test_final}")
-    return {'Probability to stay' : f"{round(X_test_final['prob_stay'],3)}",
-        "Global picture" : f"{X_test_final}" }
+    return X_test_final.to_dict()
 
 def predict_leaving(X_pred):
     """
@@ -134,7 +133,7 @@ def predict_leaving(X_pred):
                             left_index=True, right_index=True)
     X_test_final.drop(columns=['prob_stay'], inplace=True)
     X_test_final.sort_values('prob_leave', ascending=False, inplace=True)
+    X_test_final['prob_leave'] = round(X_test_final['prob_leave'],3)
 
     print(f"Ranking  : \n {X_test_final}")
-    return {'Probability to leave' : f"{round(X_test_final['prob_leave'],3)}",
-    "Global picture" : f"{X_test_final}" }
+    return X_test_final.to_dict()
