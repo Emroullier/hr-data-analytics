@@ -12,7 +12,15 @@ from xgboost import XGBClassifier
 
 # Import from .py files
 from ml_logic.data import clean_data_leaving, clean_data_hiring
-from ml_logic.preprocessor import preprocess_features_hiring, preprocess_features_leaving
+from ml_logic.preprocessor import preprocess_features_hiring,\
+                                  preprocess_features_leaving
+
+from plots.plot_func import plot_time_spend_company,\
+                            plot_feature_importance, \
+                            plot_salary,\
+                            plot_number_projects,\
+                            plot_step_count
+
 from params import *
 
 def predict_leaving(X_pred, model):
@@ -152,7 +160,14 @@ if __name__ == '__main__':
         # predict_leaving(generate_input_leaving(10),XGBClassifier())
 
         # *** predict_hiring : Ranks a set of applicants applying for the same job.***
-        predict_hiring(generate_input_hiring(10),GradientBoostingClassifier())
+        # predict_hiring(generate_input_hiring(10),GradientBoostingClassifier())
+
+        # Plotting
+        plot_time_spend_company()
+        # plot_feature_importance()
+        # plot_salary()
+        # plot_number_projects()
+        # plot_step_count()
 
         # say_hello()
 

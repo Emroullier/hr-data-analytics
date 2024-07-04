@@ -1,20 +1,18 @@
 # Basic libraries
 import pandas as pd
 import json
-
-#Pipelines and transformers
-from sklearn.pipeline import make_pipeline
-
-# Models
-from sklearn.ensemble import GradientBoostingClassifier
-from xgboost import XGBClassifier
+import matplotlib.pyplot as plt
+import os
+from os.path import exists
 
 # Import from .py files
-from hr_data_analytics_package_folder.ml_logic.data import clean_data_hiring, clean_data_leaving
-from hr_data_analytics_package_folder.ml_logic.preprocessor import preprocess_features_hiring, preprocess_features_leaving
+from hr_data_analytics_package_folder.api_functions.predict import predict_hiring, predict_leaving
 from hr_data_analytics_package_folder.params import *
+from hr_data_analytics_package_folder.api_functions.plot_api import plot_time_spend_company,\
+    plot_feature_importance, plot_salary, plot_number_projects, plot_step_count
 
-from fastapi import FastAPI,UploadFile, File
+from fastapi import FastAPI,UploadFile, File, Response
+from fastapi.responses import FileResponse
 
 app = FastAPI()
 
@@ -36,104 +34,32 @@ def create_upload_files(upload_file: UploadFile = File(...)):
     response = predict_leaving(X_pred)
     return {'Ranking' : response}
 
+@app.post("/plot_time_spend_company")
+def plot_time_spend_company_api():
+    plot_time_spend_company()
+    return FileResponse('raw_data/time_spend_company.png',
+                        media_type="image/png")
 
-def predict_hiring(X_pred):
-    """
-    - Retrieve the original data
-    - Clean and preprocess data
-    - Train model
-    - Perform prediction
-    - Return ranking of applicants based on
-      probability of staying in the company
-    """
+@app.post("/plot_feature_importance")
+def plot_feature_importance_api():
+    plot_feature_importance()
+    return FileResponse('raw_data/feature_importance.png',
+                        media_type="image/png")
 
-    print(X_pred)
-    #Retrieve dataset from local directory
-    data = pd.read_csv(DATA_HR)
+@app.post("/plot_salary")
+def plot_salary_api():
+    plot_salary()
+    return FileResponse('raw_data/salary.png',
+                        media_type="image/png")
 
-    # Clean data using data.py
-    data = clean_data_hiring(data)
-    X_pred = clean_data_hiring(X_pred)
+@app.post("/plot_number_projects")
+def plot_number_projects_api():
+    plot_number_projects()
+    return FileResponse('raw_data/number_projects.png',
+                        media_type="image/png")
 
-    # Create X and y
-    X = data.drop(columns=['left_company'])
-    y = data['left_company']
-
-    # Drop target from X_pred
-    X_pred.drop(columns=['left_company'], inplace=True)
-    X_pred_index = X_pred.index
-
-    # Create (X_train_encoded, X_test_encoded) using `preprocessor.py`
-    preproc = preprocess_features_hiring()
-
-    # Fitting the pipeline
-    model = GradientBoostingClassifier()
-    pipeline = make_pipeline(preproc, model)
-    pipeline.fit(X, y)
-
-     # Compute prediction
-    y_pred = pipeline.predict_proba(X_pred)
-    prediction = pd.DataFrame(y_pred,
-                              columns = ['prob_stay', 'prob_leave'],
-                              index=X_pred_index)
-
-    # Merging input features with prediction for visualization
-    X_test_final = pd.merge(X_pred, prediction, left_index=True, right_index=True)
-    X_test_final.drop(columns=['prob_leave'], inplace=True)
-    X_test_final.sort_values('prob_stay', ascending=False, inplace=True)
-    X_test_final['prob_stay'] = round(X_test_final['prob_stay'],3)
-
-    print(f"Ranking  : \n {X_test_final}")
-    return X_test_final.to_dict()
-
-def predict_leaving(X_pred):
-    """
-    - Retrieve the original data
-    - Clean and preprocess data
-    - Train model
-    - Perform prediction
-    - Return a ranking based on the probability
-      of a employee leaving company
-    """
-
-    print(X_pred)
-    #Retrieve dataset from local directory
-    data = pd.read_csv(DATA_HR)
-
-   # Clean data using data.py
-    data = clean_data_leaving(data)
-    X_pred = clean_data_leaving(X_pred)
-    print("✅ data cleaned")
-
-    # Create X and y
-    X = data.drop(columns=['left_company'])
-    y = data['left_company']
-
-    # Drop target from X_pred
-    X_pred.drop(columns=['left_company'], inplace=True)
-    X_pred_index = X_pred.index
-
-    # Create (X_train_encoded, X_test_encoded) using `preprocessor.py`
-    preproc = preprocess_features_leaving()
-
-    # Fitting the pipeline
-    model = XGBClassifier()
-    pipeline = make_pipeline(preproc, model)
-    pipeline.fit(X, y)
-
-    # Compute prediction
-    y_pred = pipeline.predict_proba(X_pred)
-    # breakpoint()
-    prediction = pd.DataFrame(y_pred,
-                              columns = ['prob_stay', 'prob_leave'],
-                              index=X_pred_index)
-
-    # Merging input features with prediction for visualization
-    X_test_final = pd.merge(X_pred, prediction,
-                            left_index=True, right_index=True)
-    X_test_final.drop(columns=['prob_stay'], inplace=True)
-    X_test_final.sort_values('prob_leave', ascending=False, inplace=True)
-    X_test_final['prob_leave'] = round(X_test_final['prob_leave'],3)
-
-    print(f"Ranking  : \n {X_test_final}")
-    return X_test_final.to_dict()
+@app.post("/plot_step_count")
+def plot_step_count_api():
+    plot_step_count()
+    return FileResponse('raw_data/step_count.png',
+                        media_type="image/png")
