@@ -19,7 +19,10 @@ from plots.plot_func import plot_time_spend_company,\
                             plot_feature_importance, \
                             plot_salary,\
                             plot_number_projects,\
-                            plot_step_count
+                            plot_step_count, \
+                            plot_violin, \
+                            cross_tab_count_feat,\
+                            freq_feat
 
 from params import *
 
@@ -118,7 +121,6 @@ def predict_hiring(X_pred, model):
     print(f"Ranking  : \n {X_test_final}")
     print(f"✅ predict_hiring() done")
 
-
 def generate_input_leaving(num):
     """
     - Generate dummy input features ONLY for testing application
@@ -163,11 +165,32 @@ if __name__ == '__main__':
         # predict_hiring(generate_input_hiring(10),GradientBoostingClassifier())
 
         # Plotting
-        plot_time_spend_company()
+        # plot_time_spend_company()
         # plot_feature_importance()
         # plot_salary()
         # plot_number_projects()
         # plot_step_count()
+
+        #Violin plots
+        # y='average_montly_hours'
+        # y = 'LinkedIn_Hits'
+        # y='Sensor_StepCount'
+        # y = 'Sensor_Heartbeat(Average/Min)'
+        # y = 'Sensor_Proximity(1-highest/10-lowest)'
+        # y = 'last_evaluation'
+        # plot_violin(y)
+
+        #Plots cross_tab_count_feat
+        # x = 'Gender'
+        # x ='promotion_last_5years'
+        # x ='Work_accident'
+        # x ='Rising_Star'
+        # x = 'Percent_Remote'
+        # cross_tab_count_feat(x)
+
+        #Plots freq_feat
+        input = "time_spend_company"
+        freq_feat(input)
 
         # say_hello()
 
