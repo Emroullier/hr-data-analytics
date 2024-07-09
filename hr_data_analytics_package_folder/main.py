@@ -11,23 +11,14 @@ from sklearn.ensemble import GradientBoostingClassifier
 from xgboost import XGBClassifier
 
 # Import from .py files
+from params import *
 from ml_logic.data import clean_data_leaving, clean_data_hiring
 from ml_logic.preprocessor import preprocess_features_hiring,\
                                   preprocess_features_leaving
 
-from plots.plot_func import plot_time_spend_company,\
-                            plot_feature_importance, \
-                            plot_salary,\
-                            plot_number_projects,\
-                            plot_step_count, \
-                            plot_violin, \
-                            cross_tab_count_feat,\
-                            freq_feat
-
-from params import *
-
 def predict_leaving(X_pred, model):
     """
+    This function has the sample to predict from and the supervised model used as inputs.
     - Retrieve the original data
     - Clean and preprocess data
     - Train model
@@ -38,6 +29,10 @@ def predict_leaving(X_pred, model):
     print(Fore.MAGENTA + "\n ⭐️ Use case: prediction of employee leaving (output)" + Style.RESET_ALL)
     #Retrieve dataset from local directory
     data = pd.read_csv(DATA_HR)
+
+    # Keep info to display output
+    display_output = X_pred[["ID","Name"]]
+    display_output
 
     # Clean data using data.py
     data = clean_data_leaving(data)
@@ -66,16 +61,19 @@ def predict_leaving(X_pred, model):
                               index=X_pred_index)
 
     # Merging input features with prediction for visualization
-    X_test_final = pd.merge(X_pred, prediction,
+    X_test_final = pd.merge(display_output, prediction,
                             left_index=True, right_index=True)
     X_test_final.drop(columns=['prob_stay'], inplace=True)
     X_test_final.sort_values('prob_leave', ascending=False, inplace=True)
+    X_test_final['prob_leave_percent'] = round(X_test_final['prob_leave'])*100
+    X_test_final.drop(columns=['prob_leave'], inplace=True)
 
     print(f"Ranking  : \n {X_test_final}")
     print(f"✅ pred_leaving() done")
 
 def predict_hiring(X_pred, model):
     """
+    This function has the sample to predict from and the supervised model used as inputs.
     - Retrieve the original data
     - Clean and preprocess data
     - Train model
@@ -86,6 +84,9 @@ def predict_hiring(X_pred, model):
     print(Fore.MAGENTA + "\n ⭐️ Use case: prediction of hiring an applicant" + Style.RESET_ALL)
     #Retrieve dataset from local directory
     data = pd.read_csv(DATA_HR)
+
+    # Keep info to display output
+    display_output = X_pred[["ID","Name"]]
 
     # Clean data using data.py
     data = clean_data_hiring(data)
@@ -114,9 +115,14 @@ def predict_hiring(X_pred, model):
                               index=X_pred_index)
 
     # Merging input features with prediction for visualization
-    X_test_final = pd.merge(X_pred, prediction, left_index=True, right_index=True)
+    X_test_final = pd.merge(display_output,
+                            prediction,
+                            left_index=True,
+                            right_index=True)
     X_test_final.drop(columns=['prob_leave'], inplace=True)
     X_test_final.sort_values('prob_stay', ascending=False, inplace=True)
+    X_test_final['prob_stay_percent'] = round(X_test_final['prob_stay'])*100
+    X_test_final.drop(columns=['prob_stay'], inplace=True)
 
     print(f"Ranking  : \n {X_test_final}")
     print(f"✅ predict_hiring() done")
@@ -153,46 +159,13 @@ def generate_input_hiring(num):
     print(input_features)
     return input_features
 
-def say_hello():
-    print('Hello World !')
-
 if __name__ == '__main__':
     try:
         # *** predict_leaving : Lists employees likely to quit the company ***
         # predict_leaving(generate_input_leaving(10),XGBClassifier())
 
         # *** predict_hiring : Ranks a set of applicants applying for the same job.***
-        # predict_hiring(generate_input_hiring(10),GradientBoostingClassifier())
-
-        # Plotting
-        # plot_time_spend_company()
-        # plot_feature_importance()
-        # plot_salary()
-        # plot_number_projects()
-        # plot_step_count()
-
-        #Violin plots
-        # y='average_montly_hours'
-        # y = 'LinkedIn_Hits'
-        # y='Sensor_StepCount'
-        # y = 'Sensor_Heartbeat(Average/Min)'
-        # y = 'Sensor_Proximity(1-highest/10-lowest)'
-        # y = 'last_evaluation'
-        # plot_violin(y)
-
-        #Plots cross_tab_count_feat
-        # x = 'Gender'
-        # x ='promotion_last_5years'
-        # x ='Work_accident'
-        # x ='Rising_Star'
-        # x = 'Percent_Remote'
-        # cross_tab_count_feat(x)
-
-        #Plots freq_feat
-        input = "time_spend_company"
-        freq_feat(input)
-
-        # say_hello()
+        predict_hiring(generate_input_hiring(5),GradientBoostingClassifier())
 
     except:
         import sys
