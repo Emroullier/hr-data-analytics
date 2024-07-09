@@ -10,7 +10,6 @@ install:
 test:
 	@pytest -v tests
 
-
 reset_dummy_data_files:
 	@rm -rf ${DUMMY_DIR}
 	@mkdir  ${DUMMY_DIR}

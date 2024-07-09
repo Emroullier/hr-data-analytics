@@ -50,7 +50,6 @@ def clean_data_leaving(df: pd.DataFrame) -> pd.DataFrame:
     # print("✅ data cleaned")
     return df
 
-
 def clean_data_hiring(df: pd.DataFrame) -> pd.DataFrame:
     """
     - Clean raw data by :

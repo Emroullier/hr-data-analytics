@@ -1,12 +1,11 @@
 # Basic libraries
 import numpy as np
-import pandas as pd
-
 
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import RobustScaler, MinMaxScaler, OrdinalEncoder, OneHotEncoder
+from sklearn.preprocessing import RobustScaler, MinMaxScaler, \
+                                  OrdinalEncoder, OneHotEncoder
 
 def preprocess_features_leaving():
     """
